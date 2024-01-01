@@ -6,6 +6,7 @@ import { db } from "../../../firebase";
 import { v4 as uuidv4 } from "uuid";
 import { WordContext } from "@/providers/WordsProvider";
 import { AuthContext } from "@/providers/AuthContext";
+import toSentenceCase from "../toSentenceCase";
 
 const NewWordForm = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -167,14 +168,13 @@ const NewWordForm = () => {
                 {filteredSources.map((item, _i) => (
                   <span
                     onClick={() => {
-                      console.log("hii");
                       setSource(item);
                       setIsUpdatingSource(false);
                     }}
                     key={_i}
                     className="w-full block cursor-pointer text-start py-2 px-4 hover:bg-slate-200 dark:hover:bg-gray-800/50"
                   >
-                    {item}
+                    {toSentenceCase(item)}
                   </span>
                 ))}
               </div>
