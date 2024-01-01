@@ -6,10 +6,10 @@ import Filters from "@/components/home/Filters";
 import Footer from "@/components/common/Footer";
 import Hero from "@/components/home/Hero";
 import { WordContext } from "@/providers/WordsProvider";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 
 export default function Home() {
-  const { filtedredData, loading, searchValue } = useContext(WordContext);
+  const { filtedredData, loading } = useContext(WordContext);
 
   return (
     <>

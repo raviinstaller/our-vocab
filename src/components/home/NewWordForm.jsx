@@ -5,7 +5,7 @@ import React, { useContext, useRef, useState } from "react";
 import { db } from "../../../firebase";
 import { v4 as uuidv4 } from "uuid";
 import { WordContext } from "@/providers/WordsProvider";
-import toSentenceCase from "../toSentenceCase";
+import { AuthContext } from "@/providers/AuthContext";
 
 const NewWordForm = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -18,6 +18,8 @@ const NewWordForm = () => {
 
   const { sources } = useContext(WordContext);
 
+  const { user, status, googleSignIn } = useContext(AuthContext);
+
   const resetForm = () => {
     setWord("");
     setMeaning("");
@@ -25,19 +27,31 @@ const NewWordForm = () => {
     setIsDrawerVisible(false);
   };
 
-  const handleWordSubmit = (e) => {
+  const handleWordSubmit = async (e) => {
     e.preventDefault();
-    setIsDrawerVisible(true);
-    meaningRef?.current?.focus();
+    if (status === "unauthenticated") {
+      await googleSignIn();
+    }
+
+    if (status === "authenticated") {
+      setIsDrawerVisible(true);
+      meaningRef?.current?.focus();
+    }
   };
 
   const addToFirestore = async () => {
     if (word === "" || meaning === "" || source === "") return;
+    if (status === "unauthenticated") return;
     resetForm();
     setDoc(doc(db, "words", uuidv4()), {
       word,
       meaning,
       source,
+      user: {
+        name: user.displayName,
+        id: user.uid,
+        image: user.photoURL,
+      },
     }).catch((err) => console.log(err));
 
     if (!sources.includes(source)) {
@@ -76,7 +90,7 @@ const NewWordForm = () => {
     <>
       <form
         onSubmit={handleWordSubmit}
-        className="flex flex-col  sm:flex-row sm:justify-center sm:items-center max-w-md sm:mx-auto gap-2"
+        className="flex flex-col mx-auto sm:flex-row sm:justify-center sm:items-center max-w-md sm:mx-auto gap-2"
       >
         <input
           type="text"
